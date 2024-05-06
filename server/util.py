@@ -8,10 +8,10 @@ import scipy
 from PIL import Image
 from scipy import ndimage
 
-from model.lr_utils import load_dataset
+from artifacts.lr_utils import load_dataset
 
 image = None
-model = None
+cat_model = None
 num_px = 60
 def sigmoid(z):
     s = 1/(1+ np.exp((-1)*z))
@@ -36,7 +36,7 @@ def predict(w, b, X):
 
 def predict_cat(cat_image):
     # change this to the name of your image file
-    my_image = cat_image   
+    my_image = cat_image  or "my-image.jpg"  
     train_set_x_orig, train_set_y, test_set_x_orig, test_set_y, classes = load_dataset()
     # We preprocess the image to fit your algorithm.
     fname = "../images/" + my_image
@@ -44,16 +44,19 @@ def predict_cat(cat_image):
     plt.imshow(image)
     image = image / 255.
     image = image.reshape((1, num_px * num_px * 3)).T
-    my_predicted_image = predict(model["w"], model["b"], image)
+    my_predicted_image = predict(cat_model["w"], cat_model["b"], image)
 
+    str = "y = " + str(np.squeeze(my_predicted_image)) + ", your algorithm predicts a \"" + classes[int(np.squeeze(my_predicted_image)),].decode("utf-8") +  "\" picture."
     print("y = " + str(np.squeeze(my_predicted_image)) + ", your algorithm predicts a \"" + classes[int(np.squeeze(my_predicted_image)),].decode("utf-8") +  "\" picture.")
+    return str
 
 
 def load_saved_artifacts():
-    global model
-    
-    with open('./artifacts/bengaluru_prices_model.pickle','rb') as f:
-        model = pickle.load(f)
+    global cat_model
+    global image
+    global num_px
+    with open('./artifacts/cat_prediction_model.pickle','rb') as f:
+        cat_model = pickle.load(f)
     
 
 if __name__=="__main__":
